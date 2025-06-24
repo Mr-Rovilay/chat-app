@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.0 <0.9.0;
+
+contract ChatApp {
+    struct friend {
+        string name;
+        address pubkey;
+    }
+
+    //user struct
+    struct User {
+        string name;
+        friend[] friendList;
+    }
+
+    struct Message {
+        address sender;
+        string msg;
+        uint256 timestamp;
+    }
+
+    mapping(address => User) public userList;
+    mapping(bytes32 => Message[])  allMessages;
+
+    // check user exists
+    function checkUserExists(address pubkey) public view returns (bool) {
+        return bytes(userList[pubkey].name).length > 0;
+    }
+
+    // create account
+    function createAccount(string calldata name) external {
+        require(!checkUserExists(msg.sender), "User already exists");
+        require(bytes(name).length > 0, "Name cannot be empty");
+        userList[msg.sender].name = name;
+    }
+
+    //get username
+    function getUsername(address pubkey) external view returns (string memory) {
+        require(checkUserExists(pubkey), "User does not exist");
+        return userList[pubkey].name;
+    }
+
+    
+
+    //add friend
+    function addFriend(address friendPubkey, string calldata friendName) external {
+        require(checkUserExists(msg.sender), "You must create an account first");
+        require(checkUserExists(friendPubkey), "User does not exist");
+        require(msg.sender != friendPubkey, "You cannot add yourself as a friend");
+        require(bytes(friendName).length > 0, "Friend name cannot be empty");
+        require(!isFriend(msg.sender, friendPubkey), "This user is already your friend");
+       
+        _addFriend(msg.sender, friendPubkey, friendName);
+        _addFriend(friendPubkey, msg.sender, userList[msg.sender].name);
+    }
+
+        // check is Friend
+        function isFriend(address pubkey1, address pubkey2) internal view returns(bool){
+            if(userList[pubkey1].friendList.length > userList[pubkey2].friendList.length){
+address tmp = pubkey1;
+pubkey1 = pubkey2;
+pubkey2 = tmp;
+            }
+            for (uint256 i = 0: i < userList[pubkey1].friendList.length; i++) {
+                
+            }
+        }
+}
