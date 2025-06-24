@@ -42,26 +42,26 @@ contract ChatApp {
 
     //add friend
     function addFriend(
-        address friendPubkey,
-        string calldata friendName
+        address friend_key,
+        string calldata name
     ) external {
         require(
             checkUserExists(msg.sender),
             "You must create an account first"
         );
-        require(checkUserExists(friendPubkey), "User does not exist");
+        require(checkUserExists(friend_key), "User does not exist");
         require(
-            msg.sender != friendPubkey,
+            msg.sender != friend_key,
             "You cannot add yourself as a friend"
         );
-        require(bytes(friendName).length > 0, "Friend name cannot be empty");
+        require(bytes(name).length > 0, "Friend name cannot be empty");
         require(
-            !isFriend(msg.sender, friendPubkey),
+            !isFriend(msg.sender, friend_key),
             "This user is already your friend"
         );
 
-        _addFriend(msg.sender, friendPubkey, friendName);
-        _addFriend(friendPubkey, msg.sender, userList[msg.sender].name);
+        _addFriend(msg.sender, friend_key, name);
+        _addFriend(friend_key, msg.sender, userList[msg.sender].name);
     }
 
     // check is Friend
@@ -78,7 +78,7 @@ contract ChatApp {
             pubkey2 = tmp;
         }
         for (uint256 i = 0; i < userList[pubkey1].friendList.length; i++) {
-            if (userList[pubkey1].friendList[i].pubKey = pubkey2) return true;
+            if (userList[pubkey1].friendList[i].pubkey == pubkey2) return true;
         }
         return false;
     }
@@ -87,7 +87,7 @@ contract ChatApp {
         address friend_key,
         string memory name
     ) internal {
-        friend memory newFriend = friend(friend_key, name);
+        friend memory newFriend = friend(name, friend_key);
         userList[me].friendList.push(newFriend);
     }
 
@@ -98,13 +98,14 @@ contract ChatApp {
     }
     // get chat code
     function _getChatCode(
-        address Pubkey1,
-        address Pubkey2
+        address pubkey1,
+        address pubkey2
     ) internal pure returns (bytes32) {
-        if(Pubkey1 < Pubkey2) {
-
-        return keccak256(abi.encodePacked(pubkey1, Pubkey2));
-        } else return keccak256(abi.encodePacked(pubkey2, Pubkey1));
+        if(pubkey1 < pubkey2) {
+            return keccak256(abi.encodePacked(pubkey1, pubkey2));
+        } else {
+            return keccak256(abi.encodePacked(pubkey2, pubkey1));
+        }
     }
 
     //send message
