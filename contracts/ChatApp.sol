@@ -20,7 +20,7 @@ contract ChatApp {
     }
 
     mapping(address => User) public userList;
-    mapping(bytes32 => Message[])  allMessages;
+    mapping(bytes32 => Message[]) allMessages;
 
     // check user exists
     function checkUserExists(address pubkey) public view returns (bool) {
@@ -40,29 +40,73 @@ contract ChatApp {
         return userList[pubkey].name;
     }
 
-    
-
     //add friend
-    function addFriend(address friendPubkey, string calldata friendName) external {
-        require(checkUserExists(msg.sender), "You must create an account first");
+    function addFriend(
+        address friendPubkey,
+        string calldata friendName
+    ) external {
+        require(
+            checkUserExists(msg.sender),
+            "You must create an account first"
+        );
         require(checkUserExists(friendPubkey), "User does not exist");
-        require(msg.sender != friendPubkey, "You cannot add yourself as a friend");
+        require(
+            msg.sender != friendPubkey,
+            "You cannot add yourself as a friend"
+        );
         require(bytes(friendName).length > 0, "Friend name cannot be empty");
-        require(!isFriend(msg.sender, friendPubkey), "This user is already your friend");
-       
+        require(
+            !isFriend(msg.sender, friendPubkey),
+            "This user is already your friend"
+        );
+
         _addFriend(msg.sender, friendPubkey, friendName);
         _addFriend(friendPubkey, msg.sender, userList[msg.sender].name);
     }
 
-        // check is Friend
-        function isFriend(address pubkey1, address pubkey2) internal view returns(bool){
-            if(userList[pubkey1].friendList.length > userList[pubkey2].friendList.length){
-address tmp = pubkey1;
-pubkey1 = pubkey2;
-pubkey2 = tmp;
-            }
-            for (uint256 i = 0: i < userList[pubkey1].friendList.length; i++) {
-                
-            }
+    // check is Friend
+    function isFriend(
+        address pubkey1,
+        address pubkey2
+    ) internal view returns (bool) {
+        if (
+            userList[pubkey1].friendList.length >
+            userList[pubkey2].friendList.length
+        ) {
+            address tmp = pubkey1;
+            pubkey1 = pubkey2;
+            pubkey2 = tmp;
         }
+        for (uint256 i = 0; i < userList[pubkey1].friendList.length; i++) {
+            if (userList[pubkey1].friendList[i].pubKey = pubkey2) return true;
+        }
+        return false;
+    }
+    function _addFriend(
+        address me,
+        address friend_key,
+        string memory name
+    ) internal {
+        friend memory newFriend = friend(friend_key, name);
+        userList[me].friendList.push(newFriend);
+    }
+
+    //get my friends
+    function getMyFriendsList() external view returns (friend[] memory) {
+        require(checkUserExists(msg.sender), "You must create an account first");
+        return userList[msg.sender].friendList;
+    }
+    // get chat code
+    function _getChatCode(
+        address Pubkey1,
+        address Pubkey2
+    ) internal pure returns (bytes32) {
+        if(Pubkey1 < Pubkey2) {
+
+        return keccak256(abi.encodePacked(pubkey1, Pubkey2));
+        } else return keccak256(abi.encodePacked(pubkey2, Pubkey1));
+    }
+
+    //send message
+    
 }
