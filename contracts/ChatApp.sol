@@ -19,6 +19,11 @@ contract ChatApp {
         uint256 timestamp;
     }
 
+    struct AllUserStruct {
+        address pubkey;
+        string name;
+    }
+
     mapping(address => User) public userList;
     mapping(bytes32 => Message[]) allMessages;
 
