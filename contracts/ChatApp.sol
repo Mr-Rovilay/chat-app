@@ -144,6 +144,10 @@ contract ChatApp {
         bytes32 chatCode = _getChatCode(msg.sender, friend_key);
         return allMessages[chatCode];
     }
+
+    function getAllAppUser() public view returns (AllUserStruct[] memory) {
+        return getAllUsers;
+    }
     
     
 }
