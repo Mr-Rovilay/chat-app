@@ -82,6 +82,8 @@ contract ChatApp {
         }
         return false;
     }
+
+    //add friend
     function _addFriend(
         address me,
         address friend_key,
@@ -109,5 +111,30 @@ contract ChatApp {
     }
 
     //send message
+    function sendMessage(
+        address friend_key,
+        string calldata msg
+    ) external {
+        require(checkUserExists(msg.sender), "You must create an account first");
+        require(checkUserExists(friend_key), "User does not exist");
+        require(isFriend(msg.sender, friend_key), "This user is not your friend");
+        require(bytes(msg).length > 0, "Message cannot be empty");
+
+        bytes32 chatCode = _getChatCode(msg.sender, friend_key);
+        allMessages[chatCode].push(Message(msg.sender, msg, block.timestamp));
+    }
+    //read message
+
+    function readMessages(
+        address friend_key
+    ) external view returns (Message[] memory) {
+        require(checkUserExists(msg.sender), "You must create an account first");
+        require(checkUserExists(friend_key), "User does not exist");
+        require(isFriend(msg.sender, friend_key), "This user is not your friend");
+
+        bytes32 chatCode = _getChatCode(msg.sender, friend_key);
+        return allMessages[chatCode];
+    }
+    
     
 }
