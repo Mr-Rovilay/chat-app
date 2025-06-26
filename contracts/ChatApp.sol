@@ -20,9 +20,11 @@ contract ChatApp {
     }
 
     struct AllUserStruct {
-        address pubkey;
+        address accountAddress;
         string name;
     }
+
+    AllUserStruct[] public getAllUsers;
 
     mapping(address => User) public userList;
     mapping(bytes32 => Message[]) allMessages;
@@ -37,6 +39,8 @@ contract ChatApp {
         require(!checkUserExists(msg.sender), "User already exists");
         require(bytes(name).length > 0, "Name cannot be empty");
         userList[msg.sender].name = name;
+
+        getAllUsers.push(AllUserStruct(msg.sender, name));
     }
 
     //get username
